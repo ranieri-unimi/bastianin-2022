@@ -5,7 +5,7 @@ US election modelling &amp; forecasting
 
 - [x] dependent  variable  of  your  regressions,  that  is  the Democratic (D) share of the two party vote defined as 100*D/(D + R)
 - [x] real  percapita  GDP  by  state
-- [ ] price  index  based  on  GDP  deflator  defined  as nominal (current dollar) GDP divided by real GDP
+- [x] price  index  based  on  GDP  deflator  defined  as nominal (current dollar) GDP divided by real GDP
 - [ ] a measure of strong  growth  following  the  approach  of  Fair
 - [ ] for incumbency variables you can use the same variables used in the original paper
 

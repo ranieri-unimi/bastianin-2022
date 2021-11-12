@@ -7,7 +7,7 @@ US election modelling &amp; forecasting
 - [x] real  percapita  GDP  by  state
 - [x] price  index  based  on  GDP  deflator  defined  as nominal (current dollar) GDP divided by real GDP
 - [ ] a measure of strong  growth  following  the  approach  of  Fair
-- [ ] for incumbency variables you can use the same variables used in the original paper
+- [x] for incumbency variables you can use the same variables used in the original paper
 
 further variables such as:
 - [ ] state demographic characteristics

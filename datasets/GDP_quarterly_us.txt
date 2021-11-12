@@ -1,9 +1,4 @@
-                Quarterly Data
-
-             Nominal    Real
-              GDP       GDP    Population
- Quarter      (Y)       (X)      (POP)
-           
+ Quarter     Nominal    Real   Population
  1877.1       9.18    169.28    46.795
  1877.2       9.21    170.72    47.054
  1877.3       9.10    177.78    47.312
@@ -571,7 +566,3 @@
  2018.1   20041.00  18324.00   327.423
  2018.2   20411.90  18511.60   327.955
  2018.3   20659.00  18671.50   328.590
-
-Notes: Y is in billions of dollars
-       X is in billions of chained (2012) dollars
-       POP is in millions

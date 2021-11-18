@@ -5,8 +5,6 @@ drop state
 rename tmp state
 xtset state year, yearly
 
-xtreg y_votes_percent incumbent former_party_morethan_2 former_president_again sudden_vice lag_vice, fe
-
 gen g_4 =  gdp_4*incumbent
 gen g_3 = gdp_3*incumbent
 gen g_2 = gdp_2*incumbent
@@ -20,3 +18,4 @@ gen zz_3 = z_3*incumbent
 gen zz_2 = z_2*incumbent
 gen zz_1 = z_1*incumbent
 
+xtreg y_votes_percent incumbent former_party_morethan_2 former_president_again sudden_vice lag_vice, fe

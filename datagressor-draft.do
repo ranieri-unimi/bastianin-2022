@@ -1,6 +1,7 @@
 import delimited "\\wsl.localhost\bastianin\home\tosho\bastianin-2022\datasets-clean\xxx-final-dataset.csv"
 
 gen satias = (2*z_4 + house_midterm -1)*incumbent/2
+*gen satias = (2*z_mt_2 + house_midterm -1)*incumbent/2
 
 * fair
 replace fair_p_1 = fair_p_1*incumbent

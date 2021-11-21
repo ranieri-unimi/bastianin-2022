@@ -36,17 +36,22 @@ rename tmp state
 xtset state year, delta(4)
 
 * solo FAIR
-xtreg y_votes_percent fair_g_1 fair_p_1 z_0 incumbent-former_party_morethan_2, fe vce(cluster state)
+xtreg y_votes_percent fair_g_1 fair_p_1 z_4-z_1 incumbent-former_party_morethan_2, fe vce(cluster state)
 
 * OUR reg
-xtreg y_votes_percent fair_p_1-z_0, fe vce(cluster state)
+xtreg y_votes_percent fair_p_1-satias, fe vce(cluster state)
+
+* NO ECN
+xtreg y_votes_percent incumbent-house_midterm satias, fe vce(cluster state)
+
+
+
 
 
 
 est store FEstata
 testparm i.state 
 testparm i.year
-
 
 * fe dummy
 reg y_votes_percent def_4-unemp_1 i.state

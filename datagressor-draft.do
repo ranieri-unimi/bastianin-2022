@@ -21,14 +21,15 @@ replace z_`j'= z_`j'*incumbent
 
 * meed2mid
 forvalues j = 1/2 {
-replace def_mt_`j'= def_`j'*incumbent
+replace def_mt_`j'= def_mt_`j'*incumbent
 replace gdp_mt_`j' = gdp_mt_`j'*incumbent
 *replace z_mt_`j'= z_mt_`j'*incumbent
 
-replace avg_mt_inc_`j'= avg_mt_inc_`j'*incumbent
-replace unemp_mt_`j' = unemp_mt_`j'*incumbent
+replace avg_inc_mt_`j'= avg_inc_mt_`j'*incumbent
+*replace unemp_mt_`j' = unemp_mt_`j'*incumbent
 }
 
+replace unemp_rn = unemp_rn*incumbent
 gen z_0 = z_1 + z_2 + z_3 + z_4
 
 encode state, gen(tmp)
@@ -39,8 +40,14 @@ xtset state year, delta(4)
 * solo FAIR
 xtreg y_votes_percent fair_g_1 fair_p_1 z_4-z_1 incumbent-former_party_morethan_2, fe vce(cluster state)
 
-* OUR reg
+* OUR reg++
 xtreg y_votes_percent fair_p_1-satias, fe vce(cluster state)
+
+* regl LESS?corr
+xtreg y_votes_percent def_mt_2 gdp_mt_2 incumbent-house_midterm unemp_rn satias, fe vce(cluster state)
+
+* OUR reg
+xtreg y_votes_percent def_mt_2 def_mt_1 gdp_mt_2-satias, fe vce(cluster state)
 
 * NO ECN
 xtreg y_votes_percent incumbent-house_midterm satias, fe vce(cluster state)

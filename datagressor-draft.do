@@ -39,8 +39,8 @@ gen fair_z_1 = z_1 + z_2 + z_3 + z_4
 
 gen was_a_vice = sudden_vice + lag_vice
 
-tab state, gen(DS)
-tab year, gen(DY)
+tab state, gen(S)
+tab year, gen(Y)
 
 encode state, gen(tmp)
 drop state
@@ -66,9 +66,7 @@ testparm i.state
 
 * Now compute fitted values and assign the State to the candidate with the majority of votes.
 
-predict y_hat_vote
-
-export delimited datasets\fair-fitted-values.csv
+predict y_hat_fr
  
 *<<<<<<<< Translate popular vote into elector vote using the information here and compare your forecasts with the results for 2012 and 2020. (https://www.archives.gov/electoral-college/allocation).
 
@@ -78,91 +76,62 @@ export delimited datasets\fair-fitted-values.csv
 
 * Next, you need to apply the LASSO to the same regression, but add additional terms that you think can help forecasting presidential elections. Always keep real per capita GDP in the regression.
 
-xtreg y_votes_percent fair_p_1-gdp_mt_1  z_mt_2-former_party_morethan_2 house_midterm-was_a_vice, fe vce(cluster state)
+global x_all fair_p_1-def_mt_1 gdp_mt_1 z_mt_2-former_party_morethan_2 house_midterm-was_a_vice
 
-/* NAIVE POST*/
-lasso linear y_votes_percent (fair_g_1) fair_p_1-gdp_mt_1  z_mt_2-former_party_morethan_2 house_midterm-was_a_vice, selection(plugin, heteroskedastic) nolog
+global x_fe S2-S50 Y2-Y10
+
+xtreg y_votes_percent fair_g_1 gdp_mt_2 $x_all, fe vce(cluster state)
+
+
+************************************************************************
+
+* Y-LASSO
+lasso linear y_votes_percent ($x_fe) $x_all gdp_mt_2, selection(plugin, heteroskedastic) nolog
 lassocoef
 
-/*DOUBLE SEL*/
+global yyy house_midterm def_mt_2_pw2
+/*
+house_midterm |     x    
+ def_mt_2_pw2 |     x    
+*/
 
-dsregress y_votes_percent fair_g_1, controls((DS2-DS50 DY2-DY10) fair_p_1-def_mt_1 gdp_mt_2-gdp_mt_1  z_mt_2-former_party_morethan_2 house_midterm-was_a_vice) lasso(*, selection(cv, alllambdas))
-est sto ds
-
-lassocoef (.,for(fair_g_1)) (.,for(y_votes_percent))
-
-
-/* VERY DS*/
-* Variables from which lasso selects
-
-* FE and time effects
-tab state, gen(S)
-tab year, gen(Y)
-
-
-global X_effects DS2-DS50 DY2-DY10 
-global X_lasso fair_p_1-def_mt_1 gdp_mt_2-gdp_mt_1  z_mt_2-former_party_morethan_2 house_midterm-was_a_vice
-
-* DS lasso in two steps
-gen s1 = e(sample) // save sample
-
-* 1 Lasso for y, always include state and time effects
-lasso linear y_votes_percent ($X_effects) $X_lasso if s1, selection(plugin, heteroskedastic) nolog
+* X-LASSO
+lasso linear fair_g_1 ($x_fe) $x_all gdp_mt_2, selection(plugin, heteroskedastic) nolog
 lassocoef
 
-* 2 lasso for x
-lasso linear fair_g_1 ($X_effects) $X_lasso if s1, selection(plugin, heteroskedastic) nolog
-lassocoef
+global x_1y satias gdp_mt_2_pw2 gdp_mt_2
+global x_2y fair_g_1 fair_z_1
+/*
+**************************
+      satias |     x    
+gdp_mt_2_pw2 |     x    
+    gdp_mt_2 |     x    
+**************************
+    fair_g_1 |     x    
+    fair_z_1 |     x 
+**************************
+*/
 
-* 3 regression with selected features
-reg y_votes_percent fair_g_1 house_midterm  gdp_mt_2 satias gdp_mt_2_pw2 $X_effects
+* YX REG
+reg y_votes_percent $yyy $x_1y $x_fe, vce(robust)
+predict y_hat_ds
 
-est sto lasso_fe 
+* <<<<<<<<<  Compare the performance of LASSO with the performance of the previous model.
 
-
-estimates table m3 m4 lasso_fe ds ds_cv, stats(N r2_a) star(.1 .05 .01) keep(beertax) b(%4.3f) varlabel
-
-* Compare the performance of LASSO with the performance of the previous model.
+export delimited datasets-clean\xxx-fitted-values.csv
 
 * <<<<<<<<< Provide valid inferences for the variables selected by the LASSO and comment in relation to the OLS estimates.
-
-
 
 * <<<<<< Explain why a double-post-model selection approach is needed and a naïve post-model selection approach that simply excludes GDP from the LASSO penalty is not appropriate.
 
 
+********************************END******************************
 
-********************************CHERN******************************
+****************************USELESS DSREG***********************
 
-* XXXXXXXXXX
-global X_lasso fair_p_1-satias gdp_mt_1_pw2 gdp_mt_2_pw2 lg_avg_inc_mt_2 lg_avg_inc_mt_2
-
-
-* FE and time effects
-tab state, gen(S)
-tab year, gen(Y)
-global X_effects S2-S48 Y2-Y7  // Alaska and 1982 as base cases
-
-
-* 1 Lasso for y, always include state and time effects
-lasso linear y_votes_percent ($X_effects) $X_lasso if s1, selection(plugin, heteroskedastic) nolog
-lassocoef
-
-
-* 2 lasso for x
-lasso linear beertax ($X_effects) $X_lasso if s1, selection(plugin, heteroskedastic) nolog
-lassocoef
-
-
-dsregress vfrall beertax, controls(($X_effects) $X_lasso) selection(cv) // DS
-lassocoef (.,for(beertax)) (.,for(vfrall)) // check selected variables
-
-
-
-
-
-
-
-
-
-
+dsregress y_votes_percent gdp_mt_2, controls(($x_fe) $x_all fair_g_1) lasso(*, selection(cv, alllambdas))
+lassocoef (.,for(y_votes_percent)) (.,for(gdp_mt_2))
+*****************************                 ******************
+dsregress y_votes_percent fair_g_1, controls(($x_fe) $x_all gdp_mt_2) lasso(*, selection(cv, alllambdas))
+lassocoef (.,for(y_votes_percent)) (.,for(fair_g_1))
+****************************************************************

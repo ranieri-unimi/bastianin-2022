@@ -78,7 +78,7 @@ predict y_hat_fr
 
 global x_all fair_p_1-def_mt_1 gdp_mt_1 z_mt_2-former_party_morethan_2 house_midterm-was_a_vice
 
-global x_fe S2-S50 Y2-Y10
+global x_fe S1-S27 S29-S50 Y1-Y9
 
 xtreg y_votes_percent fair_g_1 gdp_mt_2 $x_all, fe vce(cluster state)
 

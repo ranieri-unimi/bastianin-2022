@@ -1,4 +1,4 @@
-import delimited "\\wsl.localhost\bastianin\home\tosho\bastianin-2022\datasets-clean\xxx-final-dataset.csv"
+import delimited "\\wsl.localhost\bastianin\home\tosho\bastianin-2022\datasets-clean\xxx-2012-insample-final-dataset.csv"
 
 gen satias = (2*z_4 + house_midterm -1)*incumbent/2
 *gen satias = (2*z_mt_2 + house_midterm -1)*incumbent/2
@@ -76,7 +76,7 @@ predict y_hat_fr
 
 * Next, you need to apply the LASSO to the same regression, but add additional terms that you think can help forecasting presidential elections. Always keep real per capita GDP in the regression.
 
-global x_all fair_p_1-def_mt_1 gdp_mt_1 z_mt_2-former_party_morethan_2 house_midterm-was_a_vice
+global x_all fair_p_1-def_mt_1 gdp_mt_1-former_party_morethan_2 house_midterm-was_a_vice
 
 global x_fe S1-S27 S29-S50 Y1-Y9
 
@@ -89,36 +89,40 @@ xtreg y_votes_percent fair_g_1 gdp_mt_2 $x_all, fe vce(cluster state)
 lasso linear y_votes_percent ($x_fe) $x_all gdp_mt_2, selection(plugin, heteroskedastic) nolog
 lassocoef
 
-global yyy house_midterm def_mt_2_pw2
 /*
 house_midterm |     x    
  def_mt_2_pw2 |     x    
 */
+global yyy house_midterm
+
 
 * X-LASSO
 lasso linear fair_g_1 ($x_fe) $x_all gdp_mt_2, selection(plugin, heteroskedastic) nolog
 lassocoef
 
-global x_1y satias gdp_mt_2_pw2 gdp_mt_2
-global x_2y fair_g_1 fair_z_1
+
 /*
 **************************
       satias |     x    
-gdp_mt_2_pw2 |     x    
     gdp_mt_2 |     x    
 **************************
-    fair_g_1 |     x    
-    fair_z_1 |     x 
+      z_mt_2 |     x    
+avg_inc_mt_2 |     x    
+    fair_g_1 |     x 
 **************************
 */
+global xxx z_4 gdp_mt_2_pw2 gdp_mt_2
+
 
 * YX REG
-reg y_votes_percent $yyy $x_1y $x_fe, vce(robust)
+reg y_votes_percent fair_g_1 $yyy $xxx $x_fe, vce(robust)
+
+reg y_votes_percent staias def_mt_2_pw2 $x_fe, vce(robust)
 predict y_hat_ds
 
 * <<<<<<<<<  Compare the performance of LASSO with the performance of the previous model.
 
-export delimited datasets-clean\xxx-fitted-values.csv
+export delimited datasets-clean\xxx-fitted-values.csv replace
 
 * <<<<<<<<< Provide valid inferences for the variables selected by the LASSO and comment in relation to the OLS estimates.
 

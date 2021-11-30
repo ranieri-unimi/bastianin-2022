@@ -76,7 +76,7 @@ predict y_hat_fr
 
 * Next, you need to apply the LASSO to the same regression, but add additional terms that you think can help forecasting presidential elections. Always keep real per capita GDP in the regression.
 
-global x_all fair_p_1-def_mt_1 gdp_mt_1-former_party_morethan_2 house_midterm-was_a_vice
+global x_all fair_p_1-def_mt_1 gdp_mt_1 z_mt_2-former_party_morethan_2 house_midterm-was_a_vice
 
 global x_fe S1-S27 S29-S50 Y1-Y9
 
@@ -93,7 +93,7 @@ lassocoef
 house_midterm |     x    
  def_mt_2_pw2 |     x    
 */
-global yyy house_midterm
+global yyy house_midterm def_mt_2_pw2
 
 
 * X-LASSO
@@ -104,6 +104,7 @@ lassocoef
 /*
 **************************
       satias |     x    
+gdp_mt_2_pw2 |     x    
     gdp_mt_2 |     x    
 **************************
       z_mt_2 |     x    
@@ -111,18 +112,19 @@ avg_inc_mt_2 |     x
     fair_g_1 |     x 
 **************************
 */
-global xxx z_4 gdp_mt_2_pw2 gdp_mt_2
+global xxx satias gdp_mt_2 gdp_mt_2_pw2
 
 
 * YX REG
 reg y_votes_percent fair_g_1 $yyy $xxx $x_fe, vce(robust)
 
-reg y_votes_percent staias def_mt_2_pw2 $x_fe, vce(robust)
+* xtreg y_votes_percent fair_g_1 $yyy $xxx, fe vce(cluster state)
+
 predict y_hat_ds
 
 * <<<<<<<<<  Compare the performance of LASSO with the performance of the previous model.
 
-export delimited datasets-clean\xxx-fitted-values.csv replace
+export delimited datasets-clean\xxx-fitted-values.csv
 
 * <<<<<<<<< Provide valid inferences for the variables selected by the LASSO and comment in relation to the OLS estimates.
 

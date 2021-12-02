@@ -118,7 +118,7 @@ global xxx satias gdp_mt_2 gdp_mt_2_pw2
 * YX REG
 reg y_votes_percent fair_g_1 $yyy $xxx $x_fe, vce(robust)
 
-* xtreg y_votes_percent fair_g_1 $yyy $xxx, fe vce(cluster state)
+xtreg y_votes_percent fair_g_1 $yyy $xxx, fe vce(cluster state)
 
 predict y_hat_ds
 
